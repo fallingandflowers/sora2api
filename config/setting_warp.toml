@@ -34,7 +34,7 @@ error_ban_threshold = 3
 
 [proxy]
 proxy_enabled = true
-proxy_url = "socks5://warp:1080"
+proxy_url = "socks5://127.0.0.1:1080"
 
 [watermark_free]
 watermark_free_enabled = false
