@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# 1. 增加错误检查：任何命令失败，脚本立即退出
+set -e
+
 # 设置代理配置文件路径
 CONFIG_FILE="/app/wgcf-profile.conf"
 ACCOUNT_FILE="/app/wgcf-account.pb"
@@ -8,11 +11,9 @@ ACCOUNT_FILE="/app/wgcf-account.pb"
 if [ ! -f "$CONFIG_FILE" ]; then
   echo "Warp profile not found. Generating new one..."
   
-  # 自动注册，接受TOS
-  wgcf register --accept-tos --account-file "$ACCOUNT_FILE"
-  
-  # 生成配置文件
-  wgcf generate --account-file "$ACCOUNT_FILE" --profile-file "$CONFIG_FILE"
+  # 2. 修正 wgcf 的参数：使用 --config 而不是 --account-file
+  wgcf register --accept-tos --config "$ACCOUNT_FILE"
+  wgcf generate --config "$ACCOUNT_FILE" --profile-file "$CONFIG_FILE"
   
   echo "Warp profile generated."
 else
@@ -26,6 +27,6 @@ echo "Starting wireproxy in the background..."
 # 等待几秒钟，确保代理完全启动
 sleep 3
 
-# 启动主应用程序
+# 3. 修正启动命令：使用 uvicorn 直接启动，并监听 Zeabur 指定的 PORT 环境变量
 echo "Starting main application..."
-exec python main.py
+exec uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
